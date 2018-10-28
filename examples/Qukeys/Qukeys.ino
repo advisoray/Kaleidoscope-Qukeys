@@ -59,10 +59,10 @@ const macro_t *macroAction(uint8_t macro_index, uint8_t key_state) {
   return MACRO_NONE;
 }
 
-void setup() {
-  // Use Qukeys
-  Kaleidoscope.use(&Qukeys);
+// Use Qukeys
+KALEIDOSCOPE_INIT_PLUGINS(Qukeys, Macros);
 
+void setup() {
   QUKEYS(
     kaleidoscope::Qukey(0, 2, 1, Key_LeftGui),      // A/cmd
     kaleidoscope::Qukey(0, 2, 2, Key_LeftAlt),      // S/alt
@@ -71,9 +71,7 @@ void setup() {
     kaleidoscope::Qukey(0, 3, 6, ShiftToLayer(1))   // Q/layer-shift (on `fn`)
   )
   Qukeys.setTimeout(200);
-
-  // To toggle Qukeys off and on, we use a macro
-  Kaleidoscope.use(&Macros);
+  Qukeys.setReleaseDelay(20);
 
   Kaleidoscope.setup();
 }

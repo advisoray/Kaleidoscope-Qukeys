@@ -72,7 +72,7 @@ struct QueueItem {
 };
 
 // The plugin itself
-class Qukeys : public KaleidoscopePlugin {
+class Qukeys : public kaleidoscope::Plugin {
   // I could use a bitfield to get the state values, but then we'd
   // have to check the key_queue (there are three states). Or use a
   // second bitfield for the indeterminite state. Using a bitfield
@@ -81,7 +81,6 @@ class Qukeys : public KaleidoscopePlugin {
  public:
   Qukeys(void);
 
-  void begin(void) final;
   static void activate(void) {
     active_ = true;
   }
@@ -94,13 +93,21 @@ class Qukeys : public KaleidoscopePlugin {
   static void setTimeout(uint16_t time_limit) {
     time_limit_ = time_limit;
   }
+  static void setReleaseDelay(uint8_t release_delay) {
+    release_delay_ = release_delay;
+  }
 
   static Qukey * qukeys;
   static uint8_t qukeys_count;
 
+  EventHandlerResult onSetup();
+  EventHandlerResult onKeyswitchEvent(Key &mapped_key, byte row, byte col, uint8_t key_state);
+  EventHandlerResult beforeReportingState();
+
  private:
   static bool active_;
   static uint16_t time_limit_;
+  static uint8_t release_delay_;
   static QueueItem key_queue_[QUKEYS_QUEUE_MAX];
   static uint8_t key_queue_length_;
   static bool flushing_queue_;
@@ -117,14 +124,10 @@ class Qukeys : public KaleidoscopePlugin {
   static int8_t lookupQukey(uint8_t key_addr);
   static void enqueue(uint8_t key_addr);
   static int8_t searchQueue(uint8_t key_addr);
-  static void flushKey(bool qukey_state, uint8_t keyswitch_state);
+  static bool flushKey(bool qukey_state, uint8_t keyswitch_state);
   static void flushQueue(int8_t index);
   static void flushQueue(void);
-
-  static Key keyScanHook(Key mapped_key, byte row, byte col, uint8_t key_state);
-  static void preReportHook(void);
-  static void postReportHook(void) {}
-  static void loopHook(bool post_clear);
+  static bool isQukey(uint8_t addr);
 };
 
 } // namespace kaleidoscope {
